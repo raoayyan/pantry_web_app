@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Camera } from "react-camera-pro";
+import  Camera  from "react-camera-pro";
 import { storage } from "@/lib/firebaseConfig";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
