@@ -125,7 +125,7 @@ const PantryItemList: React.FC = () => {
     setLoading(true); // Start loading
     setRecipe(null); // Clear previous recipe
     const itemDetails = items.map(item => `${item.name}: ${item.quantity}`).join(", ");
-    console.log("API Key:", process.env.NEXT_PUBLIC_OPENROUTER_API_KEY);
+    
 
     try {
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
