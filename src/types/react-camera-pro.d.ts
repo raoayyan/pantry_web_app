@@ -1,14 +1,13 @@
-// src/types/react-camera-pro.d.ts
 declare module 'react-camera-pro' {
-    import React from 'react';
-  
-    interface CameraProps {
-      ref?: React.RefObject<any>;
-      aspectRatio?: number;
-      facingMode?: 'user' | 'environment';
-      numberOfCamerasCallback?: (numCameras: number) => void;
-    }
-  
-    export default class Camera extends React.Component<CameraProps> {}
+  import { RefObject } from 'react';
+
+  export interface CameraProps {
+    aspectRatio?: number | string;
+    facingMode?: 'user' | 'environment';
+    ref?: RefObject<any>;
+    // Add other props as needed
   }
-  
+
+  const Camera: React.FC<CameraProps>;
+  export default Camera;
+}

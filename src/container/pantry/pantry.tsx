@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Camera } from "react-camera-pro";
+import Camera from "react-camera-pro";
+import Webcam from "react-webcam";
 import { storage } from "@/lib/firebaseConfig";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
@@ -23,13 +24,19 @@ const PantryItemList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
-  const camera = useRef<any>(null);
+
+  const webcamRef = React.useRef<Webcam | null>(null);
 
   const handleTakePicture = () => {
-    const image = camera.current.takePhoto();
-    setImageUrl(image);
-    setIsCameraOpen(false); // Close camera after taking picture
+    
   };
+  const capture = React.useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setImageUrl(imageSrc);
+      setIsCameraOpen(false);
+    }
+  }, [webcamRef]);
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -234,14 +241,17 @@ const PantryItemList: React.FC = () => {
 
           {isCameraOpen && (
             <div className="mb-6">
-              <Camera
-                ref={camera}
-                aspectRatio={16 / 9}
-                facingMode="environment"
-                // className="rounded-lg overflow-hidden"
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{
+                  facingMode: "environment",
+                  aspectRatio: 4 / 3
+                }}
               />
               <button
-                onClick={handleTakePicture}
+                onClick={capture}
                 className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105"
               >
                 Take Picture

@@ -44,7 +44,7 @@ function Team() {
           <div className="bg-white">
             <div className="py-8 px-9">
               <p className="text-lg font-bold text-black">Hamza Anwar</p>
-              <p className="mt-1 text-gray-600 text-500">CMO</p>
+              <p className="mt-1 text-gray-600 text-500">Security Engineer</p>
               <p className="mt-6 text-base text-gray-700">
                 Dedicated Security Engineer with a strong foundation in
                 safeguarding digital assets. Possessing 2+ years of experience
