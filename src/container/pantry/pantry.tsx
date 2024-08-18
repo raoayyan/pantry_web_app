@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import  Camera  from "react-camera-pro";
+import { Camera } from "react-camera-pro";
 import { storage } from "@/lib/firebaseConfig";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
@@ -124,201 +124,232 @@ const PantryItemList: React.FC = () => {
   const suggestRecipe = async () => {
     setLoading(true); // Start loading
     setRecipe(null); // Clear previous recipe
-    const itemDetails = items.map(item => `${item.name}: ${item.quantity}`).join(", ");
-    
+    const itemDetails = items
+      .map((item) => `${item.name}: ${item.quantity}`)
+      .join(", ");
 
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "qwen/qwen-2-7b-instruct:free",
-          messages: [
-            {
-              role: "user",
-              content: `Suggest a recipe using these ingredients: ${itemDetails}`,
-            },
-          ],
-        }),
-      });
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "qwen/qwen-2-7b-instruct:free",
+            messages: [
+              {
+                role: "user",
+                content: `Suggest a recipe using these ingredients: ${itemDetails}`,
+              },
+            ],
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        const recipeContent = data.choices[0]?.message?.content || "No recipe found.";
+        const recipeContent =
+          data.choices[0]?.message?.content || "No recipe found.";
         setRecipe(recipeContent);
       } else {
         console.error("Failed to fetch recipe");
       }
     } catch (error) {
       console.error("Error fetching recipe", error);
-    }finally {
+    } finally {
       setLoading(false); // End loading
     }
   };
 
   return (
-    <div>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Pantry Items</h2>
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 text-center mb-12 animate-fade-in-down">
+          My Smart Pantry
+        </h1>
 
-        {/* Camera Button */}
-        {!isCameraOpen && (
-          <button
-            onClick={() => setIsCameraOpen(true)}
-            className="px-4 py-2 m-2 text-sm rounded-full font-bold text-white bg-blue-500 transition-all duration-300 hover:bg-blue-700 flex items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 4a2 2 0 012-2h3l1 2h8l1-2h3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V4z"
+        <div className="bg-white rounded-lg shadow-xl p-6 mb-8 animate-fade-in-up">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-700">
+            Add New Item
+          </h2>
+
+          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
+            {!isCameraOpen && (
+              <button
+                onClick={() => setIsCameraOpen(true)}
+                className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Open Camera
+              </button>
+            )}
+
+            <label className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
+              </svg>
+              Upload Image
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
               />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 11c1.933 0 3.5 1.567 3.5 3.5S13.933 18 12 18s-3.5-1.567-3.5-3.5S10.067 11 12 11z"
-              />
-            </svg>
-            Open Camera
-          </button>
-        )}
-
-        {/* Camera Component */}
-        {isCameraOpen && (
-          <>
-            <Camera
-              ref={camera}
-              aspectRatio={16 / 9}
-              facingMode="environment"
-            />
-            <button
-              onClick={handleTakePicture}
-              className="px-4 py-2 m-2 text-sm rounded-full font-bold text-white bg-green-500 transition-all duration-300 hover:bg-green-700"
-            >
-              Take Picture
-            </button>
-          </>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="px-4 py-2 m-2 text-sm rounded-full font-bold text-white bg-blue-500 transition-all duration-300 hover:bg-blue-700"
-        />
-
-        {imageUrl && <img src={imageUrl} alt="Preview" className="mt-4" />}
-
-        {/* Add Item Form */}
-        <form onSubmit={handleSubmit} className="mb-6">
-          <div className="flex space-x-4 mb-4">
-            <input
-              type="text"
-              name="name"
-              value={newItem.name}
-              onChange={handleChange}
-              placeholder="Item Name"
-              className="px-4 py-2 border rounded"
-            />
-            <input
-              type="number"
-              name="quantity"
-              value={newItem.quantity}
-              onChange={handleChange}
-              placeholder="Quantity"
-              className="px-4 py-2 border rounded"
-            />
+            </label>
           </div>
-          {error && <p className="text-red-500 mb-2">{error}</p>}
-          <button
-            type="submit"
-            className="px-4 py-2 text-sm rounded-full font-bold text-white bg-green-500 transition-all duration-300 hover:bg-green-700"
-          >
-            Add Item
-          </button>
-        </form>
-      </div>
 
-      <div className="font-sans p-4 mx-auto xl:max-w-7xl lg:max-w-5xl md:max-w-3xl max-w-md">
-        <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-16">
-          Pantry Items
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isCameraOpen && (
+            <div className="mb-6">
+              <Camera
+                ref={camera}
+                aspectRatio={16 / 9}
+                facingMode="environment"
+                // className="rounded-lg overflow-hidden"
+              />
+              <button
+                onClick={handleTakePicture}
+                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                Take Picture
+              </button>
+            </div>
+          )}
+
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt="Preview"
+              className="mt-4 rounded-lg shadow-md max-w-full h-auto"
+            />
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+              <input
+                type="text"
+                name="name"
+                value={newItem.name}
+                onChange={handleChange}
+                placeholder="Item Name"
+                className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                type="number"
+                name="quantity"
+                value={newItem.quantity}
+                onChange={handleChange}
+                placeholder="Quantity"
+                className="w-full md:w-32 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            {error && <p className="text-red-500 mt-2">{error}</p>}
+            <button
+              type="submit"
+              className="mt-4 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Add Item
+            </button>
+          </form>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {items.map((item) => (
             <div
-              className="bg-gray-100 p-2 overflow-hidden cursor-pointer"
               key={item.id}
+              className="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
             >
-              <div className="bg-white flex flex-col h-full">
-                <div className="w-full h-[250px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
-                  {item.imageUrl && (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
+              <div className="relative pb-2/3">
+                {item.imageUrl && (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="relative h-full w-full object-cover"
+                  />
+                )}
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  {item.name}
+                </h3>
+                <p className="text-gray-600 mb-4">Quantity: {item.quantity}</p>
+                <div className="flex space-x-2">
+                  <button
+                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 ease-in-out"
+                    onClick={() => handleEdit(item.id)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300 ease-in-out"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
-
-                <div className="p-6 text-center flex-1">
-                  <h3 className="text-lg font-bold text-gray-800">
-                    {item.name}
-                  </h3>
-                  <h4 className="text-xl text-gray-800 font-bold mt-3">
-                    Quantity: {item.quantity}
-                  </h4>
-                </div>
-                <button
-                  className="px-4 py-2 mb-4 text-sm rounded-full font-bold text-white bg-blue-500 transition-all duration-300 hover:bg-blue-700"
-                  onClick={() => handleEdit(item.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="px-4 py-2 text-sm rounded-full font-bold text-white bg-red-500 transition-all duration-300 hover:bg-red-700"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  Delete
-                </button>
               </div>
             </div>
           ))}
         </div>
 
-       
-      </div>
-      <button onClick={suggestRecipe} disabled={loading} className="px-4 py-2 text-sm rounded-full font-bold text-white bg-green-500 transition-all duration-300 hover:bg-green-700">
-        {loading ? 'Loading...' : 'Suggest Recipe'}
-      </button>
-      
-      {loading && <p>Loading your recipe, please wait...</p>}
-      
-      {recipe && (
-        <div className="mt-4 p-4 bg-gray-200 rounded">
-          <h3>Suggested Recipe:</h3>
-          <p>{recipe}</p>
-        </div>
-      )}
+        <div className="mt-12 text-center">
+          <button
+            onClick={suggestRecipe}
+            disabled={loading}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Generating Recipe..." : "Suggest Recipe"}
+          </button>
 
-      {/* <button
-        onClick={suggestRecipe}
-        className="px-4 py-2 text-sm rounded-full font-bold text-white bg-green-500 transition-all duration-300 hover:bg-green-700"
-      >
-        Suggest Recipe
-      </button>
-      
-      {recipe && <div className="mt-4 p-4 bg-gray-200 rounded">{recipe}</div>} */}
+          {loading && (
+            <p className="mt-4 text-gray-600 animate-pulse">
+              Creating a delicious recipe just for you...
+            </p>
+          )}
+
+          {recipe && (
+            <div className="mt-8 p-6 bg-white rounded-lg shadow-xl animate-fade-in">
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">
+                Suggested Recipe:
+              </h3>
+              <p className="text-gray-600 ">{recipe}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
